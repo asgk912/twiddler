@@ -6,7 +6,6 @@
   </head>
   <body>
     <script>
-
       $(document).ready(function(){
         var $body = $('body');
         $body.html('');
@@ -15,13 +14,16 @@
         while(index >= 0){
           var tweet = streams.home[index];
           var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
+          $tweet.text('@' + tweet.user + ': ' + tweet.message + '\n on ' + tweet.created_at + '\n\n');
+          $tweet.html($tweet.html().replace(/\n/g,'<br/>'));
           $tweet.appendTo($body);
           index -= 1;
         }
+        // var d = new Date();
 
       });
-
     </script>
+    
+    <!-- <button id="New Tweet" onclick="test()">Insert after</button> -->
   </body>
 </html>
