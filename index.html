@@ -3,6 +3,23 @@
   <head>
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
+    <style>
+      .new-tweets{
+        color: rgb(205, 92, 92);
+      }
+      .tweets{
+        width: 35em;
+        border: 1px solid #333;
+      }
+      #refresh{
+         font-size: 16px
+         padding: 15px 32px;
+         text-align: center;
+         margin: 16px 0
+         order-radius: 3px;
+         border: 2px solid #4CAF50;
+      }
+    </style>
   </head>
   <body>
     <script>
@@ -10,20 +27,40 @@
         var $body = $('body');
         $body.html('');
 
-        var index = streams.home.length - 1;
-        while(index >= 0){
+        var numberOfTweets = streams.home.length-1;        
+
+        for(var index = streams.home.length - 1; index>=0; index--){
           var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
+          var $tweet = $('<div class="tweets"></div>');
           $tweet.text('@' + tweet.user + ': ' + tweet.message + '\n on ' + tweet.created_at + '\n\n');
           $tweet.html($tweet.html().replace(/\n/g,'<br/>'));
           $tweet.appendTo($body);
-          index -= 1;
         }
-        // var d = new Date();
+
+        // Add a button at the top to 
+        $body.before($('<input id=refresh type="button" value="Refresh for New Tweet">'));
+        // On click, write down new tweets on top (rever chronological) by rewriting the whole thing
+        $('#refresh').click(function() {
+          $body.html('');
+          writeAll();
+
+        });
+
+        var writeAll = function(){
+          for(var index = streams.home.length - 1; index>=0; index--){
+            var tweet = streams.home[index];
+            if(index > numberOfTweets){
+              var $tweet = $('<div class="tweets new-tweets"></div>');
+            } else {
+              var $tweet = $('<div class="tweets"></div>');
+            }
+            $tweet.text('@' + tweet.user + ': ' + tweet.message + '\n on ' + tweet.created_at + '\n\n');
+            $tweet.html($tweet.html().replace(/\n/g,'<br/>'));
+            $tweet.appendTo($body);
+          }
+        }
 
       });
     </script>
-    
-    <!-- <button id="New Tweet" onclick="test()">Insert after</button> -->
   </body>
 </html>
