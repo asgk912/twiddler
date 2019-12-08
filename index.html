@@ -1,66 +1,255 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="jquery.js"></script>
-    <script src="data_generator.js"></script>
-    <style>
-      .new-tweets{
-        color: rgb(205, 92, 92);
-      }
-      .tweets{
-        width: 35em;
-        border: 1px solid #333;
-      }
-      #refresh{
-         font-size: 16px
-         padding: 15px 32px;
-         text-align: center;
-         margin: 16px 0
-         order-radius: 3px;
-         border: 2px solid #4CAF50;
-      }
-    </style>
-  </head>
-  <body>
-    <script>
-      $(document).ready(function(){
-        var $body = $('body');
-        $body.html('');
+	<head>
+		<script src="jquery.js"></script>
+		<script src="data_generator.js"></script>
 
-        var numberOfTweets = streams.home.length-1;        
+		<script>
+			$(document).ready(function(){
+				$('.whose').text('Everyone');
 
-        for(var index = streams.home.length - 1; index>=0; index--){
-          var tweet = streams.home[index];
-          var $tweet = $('<div class="tweets"></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message + '\n on ' + tweet.created_at + '\n\n');
-          $tweet.html($tweet.html().replace(/\n/g,'<br/>'));
-          $tweet.appendTo($body);
-        }
+				var $tweetPage = $('.tweetTimeLine');
+				$tweetPage.html('');
 
-        // Add a button at the top to 
-        $body.before($('<input id=refresh type="button" value="Refresh for New Tweet">'));
-        // On click, write down new tweets on top (rever chronological) by rewriting the whole thing
-        $('#refresh').click(function() {
-          $body.html('');
-          writeAll();
+				var startTweet = '';
 
-        });
+				for(var index = streams.home.length - 1; index>=0; index--){
+					var tweet = streams.home[index];
+			   		var $tweet = $('<div class="tweets"></div>');
 
-        var writeAll = function(){
-          for(var index = streams.home.length - 1; index>=0; index--){
-            var tweet = streams.home[index];
-            if(index > numberOfTweets){
-              var $tweet = $('<div class="tweets new-tweets"></div>');
-            } else {
-              var $tweet = $('<div class="tweets"></div>');
-            }
-            $tweet.text('@' + tweet.user + ': ' + tweet.message + '\n on ' + tweet.created_at + '\n\n');
-            $tweet.html($tweet.html().replace(/\n/g,'<br/>'));
-            $tweet.appendTo($body);
-          }
-        }
+			   		// Handle Time
+			   		var tweetCreatedShort = tweet.created_at.toString().split(' ').slice(1,5).join(' ');
+			   		if(index === 0){
+			   			startTweet = tweetCreatedShort;
+			   		}
 
-      });
-    </script>
-  </body>
+			   		var tweetString = '@' + tweet.user + ': ' + tweet.message + '\n' + tweetCreatedShort;
+			   		$tweet.text(tweetString);
+			   		$tweet.html($tweet.html().replace(/\n/g,'<br/>'));
+			   		$tweet.html($tweet.html().replace(tweet.user, '<span class="' + tweet.user + '">' + tweet.user + '</span>'))
+			   		$tweet.appendTo($tweetPage);
+				}
+
+				// New Tweet Button
+				$('.refresh').html('<input id=refresh type="button" value="New Tweet">');
+				// On click, write down new tweets on top (rever chronological) by rewriting the whole thing
+				$('.refresh').click(function() {
+				   writeAll();
+				   $('.refresh').html('<input id=refresh type="button" value="New Tweet">');
+				});
+
+				// Make Each Usernae Clickable
+				$(".shawndrost").click(function(){
+					writeEach('shawndrost');
+				});
+				$(".sharksforcheap").click(function(){
+					writeEach('sharksforcheap');
+				});
+				$(".mracus").click(function(){
+					writeEach('mracus');
+				});
+				$(".douglascalhoun").click(function(){
+					writeEach('douglascalhoun');
+				});
+
+				// function to write down all the tweets, highlights new tweets since the beginning
+				var writeAll = function(){
+					$('.whose').text('Everyone');
+					$tweetPage.html('');
+
+					for(var index = streams.home.length - 1; index>=0; index--){
+						var tweet = streams.home[index];
+
+						var tweetCreatedShort = tweet.created_at.toString().split(' ').slice(1,5).join(' ');
+
+						// based on the time generated, 
+						if(tweetCreatedShort === startTweet){
+							var $tweet = $('<div class="tweets"></div>');
+						} else {
+							var $tweet = $('<div class="tweets new_tweets"></div>');
+						}
+
+				   		var tweetString = '@' + tweet.user + ': ' + tweet.message + '\n' + tweetCreatedShort;
+
+						
+						$tweet.text(tweetString);
+				   		$tweet.html($tweet.html().replace(/\n/g,'<br/>'));
+				   		$tweet.html($tweet.html().replace(tweet.user, '<span class="' + tweet.user + '">' + tweet.user + '</span>'))
+				   		$tweet.appendTo($tweetPage);
+				   }
+				   makeUserNameClickable();
+				}
+				
+				var writeEach = function(username){
+					$('.whose').text(username);
+					$tweetPage.html('');
+
+					for(var index = streams.users[username].length - 1; index>=0; index--){
+						var tweet = streams.users[username][index];
+
+						var tweetCreatedShort = tweet.created_at.toString().split(' ').slice(1,5).join(' ');
+
+						// based on the time generated, 
+						if(tweetCreatedShort === startTweet){
+							var $tweet = $('<div class="tweets"></div>');
+						} else {
+							var $tweet = $('<div class="tweets new_tweets"></div>');
+						}
+
+				   		var tweetString = '@' + tweet.user + ': ' + tweet.message + '\n' + tweetCreatedShort;
+
+						
+						$tweet.text(tweetString);
+				   		$tweet.html($tweet.html().replace(/\n/g,'<br/>'));
+				   		$tweet.html($tweet.html().replace(tweet.user, '<span class="' + tweet.user + '">' + tweet.user + '</span>'))
+				   		$tweet.appendTo($tweetPage);
+				   }
+
+				   $('.refresh').html('<input id=refresh type="button" value="All Tweets">');
+			   		makeUserNameClickable();
+				}
+
+				// Make Each User Name Clickable Again
+				var makeUserNameClickable = function(){
+					$(".shawndrost").click(function(){
+						// alert('blahblahblahblah');
+	   					writeEach('shawndrost');
+					});
+					$(".sharksforcheap").click(function(){
+	   					writeEach('sharksforcheap');
+					});
+					$(".mracus").click(function(){
+	   					writeEach('mracus');
+					});
+					$(".douglascalhoun").click(function(){
+	   					writeEach('douglascalhoun');
+					});
+				}
+			});
+		</script>
+
+		<style>
+			body{
+				background-color: #E6ECF0;
+				font-family: Helvetica;
+				padding: 0;
+			}
+			header{
+				box-sizing: border-box;
+				height: 40px;
+				color: #ffffff;
+				background-color: #1da1f2;
+				margin: 0;
+				padding-left: 10px;
+				font-size: 30px;
+				vertical-align: middle;
+			}
+			#refresh{
+				font-size: 16px;
+				margin: 5px 5px;
+			}
+			.display{
+				box-sizing: border-box;
+				display: inline-block;
+				margin: 0;
+				padding: 0;
+			}
+			.dp_1_3{
+				width: 200px;
+				font-size: 14px;
+				text-align: left;
+				vertical-align: top;
+			}
+			.profile_box{
+				margin: 5px 5px 0 5px;
+				border: 2px solid #888888;
+				padding: 5px;
+				background-color: #ffffff;
+				height: 100px;
+			}
+			#name{
+				font-size: 15px;
+				line-height: 20px;
+			}
+			#link{
+				color: #1B95E0;
+			}
+			.dp_2_3{
+				width: 700px;
+			}
+			.tweetMainPage{
+				/*width: 50% !important;*/
+				margin: 5px 5px 0 5px;
+				border: 2px solid #888888;
+				padding: 5px;
+				background-color: #ffffff;
+			}
+			.tweets{
+				margin: 0px;
+				border: 3px 3px 0 3px;
+				border-top: 1px solid #888888;
+				border-bottom: 1px solid #888888;
+			}
+			.new_tweets{
+				background-color: #d1ecfc;
+			}
+			.text_description{
+				margin: 3px 3px 10px 3px;
+				font-size: 20px;
+				font-weight: bold;
+			}
+			span{
+				font-weight: bold;
+			}
+			span:hover{
+ 			   text-decoration: underline;
+ 			}
+ 			.dp_3_3{
+				width: 300px;
+				text-align: left;
+				vertical-align: top;
+			}
+			.add_my_tweet{
+				/*width: 50% !important;*/
+				margin: 5px 5px 0 5px;
+				border: 2px solid #888888;
+				padding: 5px;
+				background-color: #ffffff;
+			}
+			.notification{
+				color: #FF00FF;
+				font-weight: bold;
+			}
+		</style>
+	</head>
+	<body>
+		<header>HR twiddler</header>
+		<div class='display'>
+			<div class='display dp_1_3'>
+				<div class='profile_box'>
+					<div class='text_description'>Profile</div>
+					<div id='name'>Albert Kim</div>
+					<div id='ID'>@asgk912</div>
+					<a href='https://github.com/asgk912' id='link'>github.com/asgk912</a>
+				</div>
+				<div class='refresh'></div>
+			</div>
+			<div class='display dp_2_3'>
+				<div class='tweetMainPage'>
+					<div class='text_description whose'></div>
+					<div class='tweetTimeLine'></div>
+				</div>
+			</div>
+			<div class='display dp_3_3'>
+				<div class='add_my_tweet'>
+					<form>
+						<div class='text_description'>Add My Tweet</div>
+						<input type='text' class='my_tweet'>
+						<input type="submit" value='tweet'>
+					</form>
+					<div class='notification'>this function is not implemented yet</div>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>
